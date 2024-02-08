@@ -1,39 +1,60 @@
-import random
+def check_win(board):
+    for i in range(3):
+        if board[i][0] == board[i][1] == board[i][2] != ' ' or \
+           board[0][i] == board[1][i] == board[2][i] != ' ':
+            return True
 
-def caesar_cipher(text, key):
-    encrypted_text = ''
-    for char in text:
-        if char.isalpha():
-            shift = 65 if char.isupper() else 97
-            encrypted_text += chr((ord(char) + key - shift) % 26 + shift)
+    if board[0][0] == board[1][1] == board[2][2] != ' ' or \
+       board[0][2] == board[1][1] == board[2][0] != ' ':
+        return True
+
+    return False
+
+def check_draw(board):
+    for row in board:
+        for cell in row:
+            if cell == ' ':
+                return False
+    return True
+
+list = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']]
+
+def print_board(board):
+    print('   #---#---#---#')
+    for row in board:
+        print('   | ' + ' | '.join(row) + ' |')
+        print('   #---#---#---#')
+
+counter = 0
+while True:
+    print_board(list)
+    if counter % 2 == 0:
+        print('X turn')
+    else:
+        print('O turn')
+
+    pos = input('Enter a number from 1 to 9: ')
+    pos = int(pos) - 1
+    row, col = divmod(pos, 3)
+
+    if 0 <= pos <= 8 and list[row][col] == ' ':
+        if counter % 2 == 0:
+            list[row][col] = 'X'
         else:
-            encrypted_text += char
-    return encrypted_text
+            list[row][col] = 'O'
+        counter += 1
 
-try:
-    length = int(input('Довжина паролю-> '))
-    include_upper = input('Включити великі літери [Т|Н]-> ').upper() == 'Т'
-    include_lower = input('Включити малі літери [Т|Н]-> ').upper() == 'Т'
-    include_digits = input('Включити цифри [Т|Н]-> ').upper() == 'Т'
-    include_symbols = input('Включити символи [Т|Н]-> ').upper() == 'Т'
+        if check_win(list):
+            print_board(list)
+            if counter % 2 == 0:
+                print('O wins!')
+            else:
+                print('X wins!')
+            break
 
-    all_signs = ''
-
-    if include_upper:
-        all_signs += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    if include_lower:
-        all_signs += 'abcdefghijklmnopqrstuvwxyz'
-    if include_digits:
-        all_signs += '0123456789'
-    if include_symbols:
-        all_signs += '@#_*$'
-
-    password = ''.join(random.choices(all_signs, k=length))
-    print(f'Ваш пароль: {password}')
-
-    key = int(input('Введіть цифру для шифру Цезаря: '))
-    encrypted_password = caesar_cipher(password, key)
-    print(f'Зашифрований пароль: {encrypted_password}')
-
-except Exception as ex:
-    print(f'Помилка!: {ex}')
+        if check_draw(list):
+            print_board(list)
+            print("It's a draw!")
+            break
+    else:
+        print('Invalid position or position already taken')
